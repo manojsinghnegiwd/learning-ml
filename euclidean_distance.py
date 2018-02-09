@@ -35,8 +35,6 @@ test_data = full_data[-int(test_size*len(full_data)):]
 for i in train_data:
     train_set[i[-1]].append(i[:-1])
 
-print(train_data[:10])
-
 for i in test_data:
     test_set[i[-1]].append(i[:-1])
 
@@ -49,6 +47,7 @@ for group in test_set:
         if group == vote:
             correct += 1
         total += 1
+
 
 print('Accuracy: ', correct/total)
 
