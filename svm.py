@@ -35,7 +35,7 @@ class Support_Vector_Machine:
         self.max_feature_value = max(all_data)
         self.min_feature_value = min(all_data)
 
-        all_data = Nonei
+        all_data = None
 
         # support vectors yi(xi.w+b) = 1
 
@@ -45,7 +45,7 @@ class Support_Vector_Machine:
             self.max_feature_value * 0.001
         ]
 
-        b_range_multiple = 5
+        b_range_multiple = 1
         b_multiple = 5
 
         latest_optimum = self.max_feature_value * 10
@@ -80,7 +80,7 @@ class Support_Vector_Machine:
                     w = w - step
             
             norms = sorted([n for n in opt_dict])
-            opt_choice = opt_dict[nomrs[0]]
+            opt_choice = opt_dict[norms[0]]
             # ||w|| : [w, b]
             self.w = opt_choice[0]
             self.b = opt_choice[1]
@@ -93,10 +93,46 @@ class Support_Vector_Machine:
             np.dot(
                 np.array(features),
                 self.w
-            ) + b
+            ) + self.b
         )
 
+        if classfication !=0 and self.visualization:
+            self.ax.scatter(features[0], features[1], s=200, marker='*', c=self.colors[classfication])
+
         return classfication
+
+    def visualize(self):
+        [[self.ax.scatter(x[0], x[1], s=100, color=self.colors[i]) for x in data_dict[i]] for i in data_dict]
+
+        # hyperplane = x.w+b
+        def hyperplane(x,w,b,v):
+            return (-w[0]*x-b+v) / w[1]
+
+        datarange = (self.min_feature_value*0.9, self.max_feature_value*1.1)
+        hyp_x_min = datarange[0]
+        hyp_x_max = datarange[1]
+
+        # positive support vector hyperplane
+
+        psv1 = hyperplane(hyp_x_min, self.w, self.b, 1)
+        psv2 = hyperplane(hyp_x_max, self.w, self.b, 1)
+        self.ax.plot([hyp_x_min, hyp_x_max], [psv1, psv2])
+
+        # positive support vector hyperplane
+
+        nsv1 = hyperplane(hyp_x_min, self.w, self.b, -1)
+        nsv2 = hyperplane(hyp_x_max, self.w, self.b, -1)
+        self.ax.plot([hyp_x_min, hyp_x_max], [nsv1, nsv2])
+
+        
+        # positive support vector hyperplane
+
+        db2 = hyperplane(hyp_x_max, self.w, self.b, 0)
+        db1 = hyperplane(hyp_x_min, self.w, self.b, 0)
+        self.ax.plot([hyp_x_min, hyp_x_max], [db1, db2])
+
+        plt.show()
+
 
 data_dict = {
     -1: np.array([
@@ -110,3 +146,24 @@ data_dict = {
             [7, 3]
        ])
 }
+
+svm = Support_Vector_Machine()
+svm.fit(data=data_dict)
+
+predict_us = [
+    [0,10],
+    [1,3],
+    [3,4],
+    [3,5],
+    [5,5],
+    [5,6],
+    [6,-5],
+    [5,8],
+    [-1,-1]
+]
+
+for p in predict_us:
+    svm.predict(p)
+
+
+svm.visualize()
